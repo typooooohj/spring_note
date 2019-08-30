@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="accountService" class="com.ustcinfo.service.impl.AccountServiceImpl">
+        <!--注入dao-->
+        <property name="accountDao" ref="accountDao"></property>
+        <property name="txManager" ref="txManager"></property>
+    </bean>
+    <bean id="accountDao" class="com.ustcinfo.dao.impl.AccountDaoImpl">
+        <!--注入QueryRunner -->
+        <property name="runner" ref="runner"></property>
+        <!--注入ConnectionUtils-->
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+    <!-- 配QueryRunner  配置成prototype，如果是单例，一个线程在关闭,一个线程在crud就会出错-->
+    <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype">
+        <!-- 注入数据源-->
+        <!--<constructor-arg name="ds" ref="dataSource"></constructor-arg>-->
+    </bean>
+    <!-- 配置数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.cj.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/eesy?useUnicode=true&amp;characterEncoding=utf-8"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="admin"></property>
+    </bean>
+
+    <!-- 配置Connection的工具类ConnectionUtils -->
+    <bean id="connectionUtils" class="com.ustcinfo.util.ConnectionUtils">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--配置事务管理器-->
+    <bean id="txManager" class="com.ustcinfo.util.TransactionManager">
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+</beans>
